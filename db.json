@@ -1,0 +1,13 @@
+{
+	"list": [
+        {
+          "checked": false,
+          "title": "Изучить Vue"
+        },
+        {
+          "checked": true,
+          "title": "Изучить React"
+        }
+      
+	]
+}

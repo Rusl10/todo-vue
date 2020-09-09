@@ -4,45 +4,64 @@
       <div class="todo__header">
         <h4>Список задач</h4> 
       </div> 
-      <div class="todo__add-field">
-        <input type="text" placeholder="Введите текст задачи...">
-        <button class="todo__add-field-button">
-          <i class="material-icons">add</i>
-        </button>
-      </div>
+      <v-task-field 
+      @addTask="addTaskToList"
+      />
       <div class="todo__list">
-        <div class="todo__list-item">
-          <div class="todo__list-item-check">
-            <!-- <i class="material-icons">panorama_fish_eye</i> -->
-            <i class="material-icons">check_circle</i>
-          </div>
-          <p>Изучить Vue.js</p>
-          <div class="todo__list-item-remove">
-            <i class="material-icons">delete_outline</i>
-          </div>
-        </div>
-        <div class="todo__list-item todo__list-item--completed">
-          <div class="todo__list-item-check">
-            <i class="material-icons">check_circle</i>
-            
-          </div>
-          <p>Изучить Vue.js</p>
-          <div class="todo__list-item-remove">
-            <i class="material-icons">delete_outline
-</i>
-          </div>
-        </div>
+        <v-list-item 
+          v-for="(task, index) in list" 
+          :task="task" 
+          :key="index"
+          @checkTask="checkTask(index)"
+          @deleteTask="deleteTask(index)"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
+import vTaskField from './components/v-task-field'
+import vListItem from './components/v-list-item'
+import axios from 'axios'
 export default {
   name: 'App',
+  data(){
+    return {
+      list: []
+    }
+  },
+  methods: {
+    checkTask(index){
+      this.list[index].checked = !this.list[index].checked
+    },
+    deleteTask(index){
+      this.list.splice(index, 1)
+    },
+    addTaskToList(task){
+      this.list.unshift({
+        checked: false,
+        title: task
+      })
+    }
+  },
+  mounted(){
+    axios({
+      method: 'get',
+      url: 'http://localhost:3000/list'
+    })
+    .then((response) => {
+      this.list = response.data
+
+    })
+    .catch((error) =>{
+      console.log('error', error);
+      return error
+    })
+  },
   components: {
-    
+    vTaskField,
+    vListItem
   }
 }
 </script>
@@ -89,6 +108,7 @@ body{
       font-size: 16px;
       padding: 20px;
       flex: 1;
+      outline: none;
       &::-webkit-input-placeholder{
         color: #bfbfbf;
         opacity: 1;
@@ -116,6 +136,7 @@ body{
       justify-content: center;
       width: 65px;
       height: 65px;
+      outline: none;
       border: 0;
       color: #bfbfbf;
       background-color: transparent;
@@ -134,6 +155,7 @@ body{
       padding: 20px 30px;
       border-bottom: 1px solid #f4f4f4;
       &--completed{
+
           #{$self}-check{
             .material-icons{
               display: inline;
@@ -143,6 +165,9 @@ body{
           #{$self}-check:hover {
             background-color: #fff;
           
+          }
+          p {
+            text-decoration: line-through;
           }
       }
       &-check{
@@ -162,7 +187,7 @@ body{
         }
         .material-icons{
           color: #db4c3f;
-          font-size: 30px;
+          font-size: 33px;
           display: none;
         }
       }
